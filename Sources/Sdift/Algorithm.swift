@@ -157,12 +157,33 @@ internal struct Solver<O, N> {
                 
                 let backwardK = reverse(k: forwardK)
                 
-                if maxDistance % 2 == 1 {
-                    if -(step-1) <= backwardK, backwardK <= (step-1),
-                        forwardTable[k: forwardK] + backwardTable[k: backwardK] >= old.count
-                    {
-                        return difference(old: old[0..<snakeStartX], new: new[0..<snakeStartY]) +
-                            difference(old: old[snakeEndX..<old.count], new: new[snakeEndY..<new.count])
+                let isCrossingStep = maxDistance % 2 == 1
+                if isCrossingStep {
+                    let isBackwardPresented = -(step-1) <= backwardK && backwardK <= (step-1)
+                    if isBackwardPresented {
+                        let isCrossing = forwardTable[k: forwardK] + backwardTable[k: backwardK] >= old.count
+                        if isCrossing {
+                            if snakeStartX == snakeEndX {
+                                if step == 0 {
+                                    // maxDistanceのガードがあるからここには来ない
+                                    assertionFailure()
+                                } else if step == 1 {
+                                    assert(snakeEndX == old.count)
+                                    assert(snakeEndY == new.count)
+                                    assert(abs(lengthDiff) == 1)
+                                    if new.count < old.count {
+                                        return difference(old: old[new.count..<old.count],
+                                                          new: new[new.count..<new.count])
+                                    } else {
+                                        return difference(old: old[old.count..<old.count],
+                                                          new: new[old.count..<new.count])
+                                    }
+                                }
+                            }
+                            
+                            return difference(old: old[0..<snakeStartX], new: new[0..<snakeStartY]) +
+                                difference(old: old[snakeEndX..<old.count], new: new[snakeEndY..<new.count])
+                        }
                     }
                 }
             }
@@ -205,14 +226,23 @@ internal struct Solver<O, N> {
                 
                 let forwardK = reverse(k: backwardK)
                 
-                if maxDistance % 2 == 0 {
-                    if -step <= forwardK, forwardK <= step,
-                        forwardTable[k: forwardK] + backwardTable[k: backwardK] >= old.count
-                    {
-                        return difference(old: old[0..<(old.count - snakeEndX)],
-                                          new: new[0..<(new.count - snakeEndY)]) +
-                            difference(old: old[(old.count - snakeStartX)..<old.count],
-                                       new: new[(new.count - snakeStartY)..<new.count])
+                let isCrossingStep = maxDistance % 2 == 0
+                if isCrossingStep {
+                    let isForwardPresented = -step <= forwardK && forwardK <= step
+                    if isForwardPresented {
+                        let isCrossing = forwardTable[k: forwardK] + backwardTable[k: backwardK] >= old.count
+                        if isCrossing {
+                            if snakeStartX == snakeEndX {
+                                if step == 0 {
+                                    return []
+                                }
+                            }
+                            
+                            return difference(old: old[0..<(old.count - snakeEndX)],
+                                              new: new[0..<(new.count - snakeEndY)]) +
+                                difference(old: old[(old.count - snakeStartX)..<old.count],
+                                           new: new[(new.count - snakeStartY)..<new.count])
+                        }
                     }
                 }
             }

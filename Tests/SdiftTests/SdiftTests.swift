@@ -108,54 +108,70 @@ final class SdiftTests: XCTestCase {
         XCTAssertEqual(diff.items[5], .remove(oldIndex: 5))
     }
     
-    func testReconstruct0() {
-        let old = ""
-        let new = ""
+    func assertReconstruct(old: String, new: String) {
         let diff = difference(old: old, new: new)
         var renew: String = ""
         diff.reconstruct(old: Array(old), new: Array(new)) { renew.append($0) }
         XCTAssertEqual(new, renew)
     }
     
-    func testReconstruct1() {
-        let old = "abc"
-        let new = ""
-        let diff = difference(old: old, new: new)
-        var renew: String = ""
-        diff.reconstruct(old: Array(old), new: Array(new)) { renew.append($0) }
-        XCTAssertEqual(new, renew)
+    func testReconstruct() {
+        // 0x0
+        assertReconstruct(old: "", new: "")
+        // 1x0
+        assertReconstruct(old: "a", new: "")
+        // 0x1
+        assertReconstruct(old: "", new: "a")
+        // 1x1
+        assertReconstruct(old: "a", new: "a")
+        assertReconstruct(old: "a", new: "b")
+        // 2x0
+        assertReconstruct(old: "ab", new: "")
+        // 2x1
+        assertReconstruct(old: "ab", new: "c")
+        assertReconstruct(old: "ab", new: "a")
+        assertReconstruct(old: "ab", new: "b")
+        assertReconstruct(old: "aa", new: "a")
+        // 0x2
+        assertReconstruct(old: "", new: "ab")
+        // 1x2
+        assertReconstruct(old: "a", new: "bc")
+        assertReconstruct(old: "a", new: "ab")
+        assertReconstruct(old: "a", new: "ba")
+        assertReconstruct(old: "a", new: "aa")
+        
+        // 2x2 (0)
+        assertReconstruct(old: "ab", new: "cd")
+        // 2x2 (1)
+        assertReconstruct(old: "ab", new: "ad")
+        assertReconstruct(old: "ab", new: "ca")
+        assertReconstruct(old: "ab", new: "bd")
+        assertReconstruct(old: "ab", new: "cb")
+        // 2x2 (2)
+        assertReconstruct(old: "aa", new: "ad")
+        assertReconstruct(old: "ab", new: "ab")
+        assertReconstruct(old: "ab", new: "aa")
+        
+        assertReconstruct(old: "ab", new: "bb")
+        assertReconstruct(old: "ab", new: "ba")
+        
+        assertReconstruct(old: "aa", new: "ba")
+        // 2x2 (3)
+        assertReconstruct(old: "aa", new: "ab")
+        assertReconstruct(old: "aa", new: "ba")
+        assertReconstruct(old: "ab", new: "aa")
+        assertReconstruct(old: "ba", new: "aa")
+        // 2x2 (4)
+        assertReconstruct(old: "aa", new: "aa")
+
+        //
+        assertReconstruct(old: "abcabba", new: "cbabac")
+        assertReconstruct(old: "abgdef", new: "gh")
     }
     
-    func testReconstruct2() {
-        let old = ""
-        let new = "abc"
-        let diff = difference(old: old, new: new)
-        var renew: String = ""
-        diff.reconstruct(old: Array(old), new: Array(new)) { renew.append($0) }
-        XCTAssertEqual(new, renew)
-    }
-    
-    func testReconstruct3() {
-        let old = "abcabba"
-        let new = "cbabac"
-        let diff = difference(old: old, new: new)
-        var renew: String = ""
-        diff.reconstruct(old: Array(old), new: Array(new)) { renew.append($0) }
-        XCTAssertEqual(new, renew)
-    }
-    
-    func testReconstruct4() {
-        let old = "abgdef"
-        let new = "gh"
-        let diff = difference(old: old, new: new)
-        var renew: String = ""
-        diff.reconstruct(old: Array(old), new: Array(new)) { renew.append($0) }
-        XCTAssertEqual(new, renew)
-    }
-    
-    func testApply0() {
-        var old = Array("abcabba")
-        let new = Array("cbabac")
+    func assertApply(old: String, new: String) {
+        var old = Array(old)
+        let new = Array(new)
         let diff = difference(old: old, new: new)
         diff.apply(new: new,
                    insert: { (index, item) in
@@ -167,20 +183,11 @@ final class SdiftTests: XCTestCase {
         XCTAssertEqual(old, new)
     }
     
-    func testApply1() {
-        var old = Array("abgdef")
-        let new = Array("gh")
-        let diff = difference(old: old, new: new)
-        diff.apply(new: new,
-                   insert: { (index, item) in
-                    old.insert(item, at: index) },
-                   update: { (index, item) in
-                    XCTAssertEqual(old[index], item) },
-                   remove: { (index) in
-                    old.remove(at: index) })
-        XCTAssertEqual(old, new)
+    func testApply() {
+        assertApply(old: "abcabba", new: "cbabac")
+        assertApply(old: "abgdef", new: "gh")
     }
-    
+
     static var allTests = [
         ("testDifference0", testDifference0),
         ("testDifference1", testDifference1),
@@ -190,12 +197,7 @@ final class SdiftTests: XCTestCase {
         ("testDifference5", testDifference5),
         ("testDifference6", testDifference6),
         ("testDifference7", testDifference7),
-        ("testReconstruct0", testReconstruct0),
-        ("testReconstruct1", testReconstruct1),
-        ("testReconstruct2", testReconstruct2),
-        ("testReconstruct3", testReconstruct3),
-        ("testReconstruct4", testReconstruct4),
-        ("testApply0", testApply0),
-        ("testApply1", testApply1),
+        ("testReconstruct", testReconstruct),
+        ("testApply", testApply),
     ]
 }
