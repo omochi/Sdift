@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D62FC84920E5E1E2003EF7A6"
-               BuildableName = "SdiftTests-iOS.xctest"
+               BuildableName = "SdiftTests.xctest"
                BlueprintName = "SdiftTests-iOS"
                ReferencedContainer = "container:Sdift.xcodeproj">
             </BuildableReference>
