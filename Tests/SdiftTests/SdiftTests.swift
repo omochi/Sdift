@@ -184,6 +184,8 @@ final class SdiftTests: XCTestCase {
     }
     
     func testApply() {
+        assertApply(old: "a", new: "ab")
+        assertApply(old: "a", new: "ba")
         assertApply(old: "abcabba", new: "cbabac")
         assertApply(old: "abgdef", new: "gh")
     }

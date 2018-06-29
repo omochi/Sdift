@@ -57,9 +57,8 @@ public struct Difference {
             }
         }
         while newIndex < new.count {
-            insert(oldIndex + oldIndexOffset, new[newIndex])
+            update(oldIndex + oldIndexOffset, new[newIndex])
             oldIndex += 1
-            oldIndexOffset += 1
             newIndex += 1
         }
     }
